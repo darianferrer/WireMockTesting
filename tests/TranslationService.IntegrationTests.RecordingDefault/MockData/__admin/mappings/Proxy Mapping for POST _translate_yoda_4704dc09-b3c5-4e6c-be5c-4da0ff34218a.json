@@ -1,0 +1,94 @@
+{
+  "Guid": "4704dc09-b3c5-4e6c-be5c-4da0ff34218a",
+  "UpdatedAt": "2023-01-04T12:20:27.9791531Z",
+  "Title": "Proxy Mapping for POST /translate/yoda",
+  "Description": "Proxy Mapping for POST /translate/yoda",
+  "Priority": -2000000,
+  "Request": {
+    "Path": {
+      "Matchers": [
+        {
+          "Name": "WildcardMatcher",
+          "Pattern": "/translate/yoda",
+          "IgnoreCase": false
+        }
+      ]
+    },
+    "Methods": [
+      "POST"
+    ],
+    "Headers": [
+      {
+        "Name": "Content-Type",
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "application/x-www-form-urlencoded",
+            "IgnoreCase": true
+          }
+        ]
+      },
+      {
+        "Name": "Content-Length",
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "37",
+            "IgnoreCase": true
+          }
+        ]
+      },
+      {
+        "Name": "x-scenario",
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated",
+            "IgnoreCase": true
+          }
+        ]
+      }
+    ],
+    "Body": {
+      "Matcher": {
+        "Name": "ExactMatcher",
+        "Pattern": "text=Master+Obiwan+has+lost+a+planet.",
+        "IgnoreCase": true
+      }
+    }
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "success": {
+        "total": 1
+      },
+      "contents": {
+        "translated": "Lost a planet,  master obiwan has.",
+        "text": "Master Obiwan has lost a planet.",
+        "translation": "yoda"
+      }
+    },
+    "Headers": {
+      "Expires": "0",
+      "Content-Language": "en",
+      "Content-Type": "application/json; charset=utf-8",
+      "Date": "Wed, 04 Jan 2023 12:20:27 GMT",
+      "Server": "Apache",
+      "Access-Control-Allow-Origin": "*",
+      "Vary": [
+        "Accept",
+        "IS_SUBREQ",
+        "User-Agent"
+      ],
+      "X-Auth-Status": "true",
+      "X-RateLimit-Limit": "5 per hour",
+      "X-RateLimit-Remaining": "2",
+      "Cache-Control": "max-age={expires}, pre-check=86400, post-check=43200",
+      "X-Powered-By": "Luracast Restler v3.0.0rc3",
+      "Upgrade": "h2",
+      "Connection": "Upgrade",
+      "Transfer-Encoding": "chunked"
+    }
+  }
+}

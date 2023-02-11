@@ -1,0 +1,75 @@
+﻿{
+  "Request": {
+    "Path": "/translate/yoda",
+    "Methods": [
+      "POST"
+    ],
+    "Headers": [
+      {
+        "Name": "x-scenario",
+        "Matchers": [
+          {
+            "Name": "WildcardMatcher",
+            "Pattern": "GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated",
+            "IgnoreCase": true
+          }
+        ]
+      }
+    ],
+    "Body": {
+      "Matcher": {
+        "Name": "WildcardMatcher",
+        "Pattern": "text=Master+Obiwan+has+lost+a+planet.",
+        "IgnoreCase": true
+      }
+    }
+  },
+  "Response": {
+    "StatusCode": 200,
+    "BodyAsJson": {
+      "success": {
+        "total": 1
+      },
+      "contents": {
+        "translated": "Lost a planet,  master obiwan has.",
+        "text": "Master Obiwan has lost a planet.",
+        "translation": "yoda"
+      }
+    },
+    "BodyAsJsonIndented": true,
+    "Headers": {
+      "Date": [
+        "Thu, 12 Jan 2023 13:41:06 GMT"
+      ],
+      "Server": [
+        "Apache"
+      ],
+      "Access-Control-Allow-Origin": [
+        "*"
+      ],
+      "Vary": [
+        "Accept",
+        "IS_SUBREQ",
+        "User-Agent"
+      ],
+      "X-Auth-Status": [
+        "true"
+      ],
+      "X-RateLimit-Limit": [
+        "5 per hour"
+      ],
+      "X-RateLimit-Remaining": [
+        "3"
+      ],
+      "Cache-Control": [
+        "max-age={expires}, pre-check=86400, post-check=43200"
+      ],
+      "X-Powered-By": [
+        "Luracast Restler v3.0.0rc3"
+      ],
+      "Transfer-Encoding": [
+        "chunked"
+      ]
+    }
+  }
+}
