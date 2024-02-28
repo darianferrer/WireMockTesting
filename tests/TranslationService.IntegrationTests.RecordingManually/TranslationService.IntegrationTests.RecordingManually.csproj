@@ -17,6 +17,7 @@
 	<ItemGroup>
 		<PackageReference Include="AutoFixture" Version="4.18.1" />
 		<PackageReference Include="FluentAssertions" Version="6.12.0" />
+		<PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.2" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
 		<PackageReference Include="WireMock.Net" Version="1.5.48" />
@@ -39,6 +40,11 @@
 		<Content Include="MockData\**\*.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="MockData\GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated\" />
+	  <Folder Include="MockData\GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated\" />
 	</ItemGroup>
 
 </Project>

@@ -211,4 +211,9 @@ public class MockedServerConfiguration
     ///     Headers to be ignored when recording requests. By default, "traceparent" and "authorization" headers are excluded from recordings.
     /// </summary>
     public string[] IgnoredRequestHeaders { get; set; } = ["traceparent", "authorization"];
+
+    /// <summary>
+    ///     Headers to be ignored when recording responses. By default, "date" header is excluded from recordings.
+    /// </summary>
+    public string[] IgnoredResponseHeaders { get; set; } = ["date"];
 }

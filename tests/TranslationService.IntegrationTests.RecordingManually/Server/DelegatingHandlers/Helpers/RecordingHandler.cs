@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using JsonDiffPatchDotNet;
+using Newtonsoft.Json;
 using WireMock.Admin.Mappings;
 
 namespace TranslationService.IntegrationTests.RecordingManually.Server.DelegatingHandlers;
@@ -38,7 +38,8 @@ internal class RecordingHandler
             new(originalPath, content =>
             {
                 var existingModel = JsonConvert.DeserializeObject<MappingModel>(content, JsonSerialiserSettings);
-                return JToken.DeepEquals(newModelSerialised, JToken.Parse(content));
+                var diff = new JsonDiffPatch().Diff(newModelSerialised, content);
+                return diff is null;
             }),
             cancellationToken: cancellationToken);
 

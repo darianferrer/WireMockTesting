@@ -31,9 +31,6 @@
         "nginx/1.14.0",
         "(Ubuntu)"
       ],
-      "Date": [
-        "Wed, 28 Feb 2024 14:22:19 GMT"
-      ],
       "Connection": [
         "keep-alive"
       ],
@@ -48,9 +45,6 @@
       ],
       "X-RateLimit-Limit": [
         "10 per hour"
-      ],
-      "X-RateLimit-Remaining": [
-        "7"
       ],
       "Cache-Control": [
         "max-age={expires}, pre-check=86400, post-check=43200"

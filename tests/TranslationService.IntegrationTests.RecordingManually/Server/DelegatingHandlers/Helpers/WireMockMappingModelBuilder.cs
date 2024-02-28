@@ -48,7 +48,7 @@ internal class WireMockMappingModelBuilder
 
         var responseBuilder = new ResponseModelBuilder()
             .WithStatusCode(response.StatusCode)
-            .WithHeaders(response.Headers.Concat(response.Content.Headers).ToDictionary(x => x.Key, x => (object)x.Value))
+            .WithHeaders(BuildResponseHeaders(response, serverConfig))
             // TODO: Add support for other formats like xml
             .WithBodyAsJson(JsonConvert.DeserializeObject(responseBody, jsonSerializerSettings))
             .WithBodyAsJsonIndented(true);
@@ -65,6 +65,10 @@ internal class WireMockMappingModelBuilder
         .Where(x => !serverConfig.IgnoredRequestHeaders.Select(x => x.ToLower()).Contains(x.Key.ToLower()))
         .Select(h => new HeaderModelBuilder().WithName(h.Key).WithMatchers(h.Value.Select(v => BuildMatcher(v)).ToList()).Build())
         .ToList();
+
+    private static Dictionary<string, object> BuildResponseHeaders(HttpResponseMessage response, MockedServerConfiguration serverConfig) => response.Headers.Concat(response.Content.Headers)
+        .Where(x => !serverConfig.IgnoredResponseHeaders.Select(x => x.ToLower()).Contains(x.Key.ToLower()))
+        .ToDictionary(x => x.Key, x => (object)x.Value);
 
     private static async Task<BodyModel?> BuildBodyAsync(HttpContent? content, CancellationToken cancellationToken)
     {
