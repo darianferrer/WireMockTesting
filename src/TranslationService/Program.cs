@@ -17,8 +17,12 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => c.SchemaFilter<EnumSchemaFilter>());
 
-builder.Services.AddFluentValidation(fv
-    => fv.RegisterValidatorsFromAssemblyContaining<TranslationRequestValidator>());
+builder.Services.AddValidatorsFromAssemblyContaining<TranslationRequestValidator>();
+builder.Services.AddFluentValidationAutoValidation(fv =>
+{
+    fv.DisableDataAnnotationsValidation = true;
+});
+builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddHttpClient<FunTranslationServiceClient>();
 

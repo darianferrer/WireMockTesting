@@ -97,7 +97,7 @@ public class NotificationApiTests
     public async Task GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated()
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated), true);
+        AddScenarioHeader(nameof(GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -150,6 +150,7 @@ public class NotificationApiTests
     }
 
     [Fact]
+    // INFO: the mock associated with this test has been manually updated to simulate an upstream error
     public async Task GivenUpstreamError_WhenTextIsSubmitted_ThenErrorIsReturned()
     {
         // Arrange
@@ -175,7 +176,7 @@ public class NotificationApiTests
         {
             Title = "An error occurred while processing your request.",
             Status = (int)HttpStatusCode.InternalServerError,
-            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            Type = "https://tools.ietf.org/html/rfc9110#section-15.6.1",
         });
     }
 

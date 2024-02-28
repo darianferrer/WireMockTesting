@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Http;
 using Microsoft.Extensions.Options;
@@ -15,8 +16,8 @@ namespace TranslationService.IntegrationTests.RecordingManually.Server;
 public class CustomTestApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly IConfigurationRoot _configuration;
-    private readonly List<Action<HttpClient>> ClientCustomisation = new();
-    private readonly List<MockedServerConfiguration> MockedServerConfigurations = new();
+    private readonly List<Action<HttpClient>> ClientCustomisation = [];
+    private readonly List<MockedServerConfiguration> MockedServerConfigurations = [];
 
     public WireMockServer FunTranslationsServer { get; }
 
@@ -85,12 +86,14 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
                         }
                     });
 
-                services.AddTransient<ScenarioAccessor>();
-                services.AddTransient<WireMockRecordingHandler>();
-                services.AddTransient<ScenarioDelegatingHandler>();
-                services.AddTransient<NoExternalRequestsDelegatingHandler>();
-                services.AddTransient<RecordHttpCallDelegatingHandler>();
-                services.AddTransient<MockProxyDelegatingHandler>();
+                services.TryAddTransient<ScenarioAccessor>();
+                services.TryAddTransient<WireMockMappingModelBuilder>();
+                services.TryAddTransient<FilePathService>();
+                services.TryAddTransient<RecordingHandler>();
+                services.TryAddTransient<ScenarioDelegatingHandler>();
+                services.TryAddTransient<NoExternalRequestsDelegatingHandler>();
+                services.TryAddTransient<RecordHttpCallDelegatingHandler>();
+                services.TryAddTransient<MockProxyDelegatingHandler>();
 
                 services.ConfigureAll<HttpClientFactoryOptions>(options =>
                 {
@@ -159,25 +162,14 @@ public class TestConfiguration
     public string GetMockedDataFolder() => @$"..{Constants.DirSeparator}..{Constants.DirSeparator}..{Constants.DirSeparator}{MockedDataFolder}";
 
     /// <summary>
-    ///  Default WireMock server configuration. By default, "traceparent" and "authorization" headers are excluded from recordings.
-    /// </summary>
-    public MockedServerConfiguration DefaultConfig { get; set; } = new MockedServerConfiguration
-    {
-        Name = "Default",
-        IgnoredRequestHeaders = new[] { "traceparent", "authorization" }
-    };
-
-    /// <summary>
     ///     WireMock server configuration for each service.
     /// </summary>
-    public List<MockedServerConfiguration> ServiceConfigurations { get; set; }
-        = new List<MockedServerConfiguration>();
+    public List<MockedServerConfiguration> ServiceConfigurations { get; set; } = [];
 
     /// <summary>
     ///     Tracks which scenarios are using recording mode. Key: scenario name; Value: true for recording mode
     /// </summary>
-    private IDictionary<string, bool> UseRealServers { get; set; }
-        = new Dictionary<string, bool>();
+    private Dictionary<string, bool> UseRealServers { get; set; } = [];
 
     internal bool IsScenarioInRecordingMode(string? scenarioName)
     {
@@ -186,13 +178,9 @@ public class TestConfiguration
 
     internal void SetScenarioRecordingMode(string scenarioName, bool useRealServer)
     {
-        if (UseRealServers.ContainsKey(scenarioName))
+        if (!UseRealServers.TryAdd(scenarioName, useRealServer))
         {
             UseRealServers[scenarioName] = useRealServer;
-        }
-        else
-        {
-            UseRealServers.Add(scenarioName, useRealServer);
         }
     }
 
@@ -220,7 +208,7 @@ public class MockedServerConfiguration
     public string Name { get; set; } = default!;
 
     /// <summary>
-    ///     Headers to be ignored when recording requests
+    ///     Headers to be ignored when recording requests. By default, "traceparent" and "authorization" headers are excluded from recordings.
     /// </summary>
-    public string[] IgnoredRequestHeaders { get; set; } = Array.Empty<string>();
+    public string[] IgnoredRequestHeaders { get; set; } = ["traceparent", "authorization"];
 }

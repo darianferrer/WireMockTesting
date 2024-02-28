@@ -1,6 +1,6 @@
 ﻿{
   "Request": {
-    "Path": "/translate/shakespeare",
+    "Path": "/translate/yoda",
     "Methods": [
       "POST"
     ],
@@ -10,7 +10,7 @@
         "Matchers": [
           {
             "Name": "WildcardMatcher",
-            "Pattern": "GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated",
+            "Pattern": "GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated",
             "IgnoreCase": true
           }
         ]
@@ -31,35 +31,37 @@
         "total": 1
       },
       "contents": {
-        "translated": "Master obiwan hath did lose a planet.",
+        "translated": "Lost a planet,  master obiwan has.",
         "text": "Master Obiwan has lost a planet.",
-        "translation": "shakespeare"
+        "translation": "yoda"
       }
     },
     "BodyAsJsonIndented": true,
     "Headers": {
-      "Date": [
-        "Wed, 25 Jan 2023 17:36:03 GMT"
-      ],
       "Server": [
-        "Apache"
+        "nginx/1.14.0",
+        "(Ubuntu)"
+      ],
+      "Date": [
+        "Wed, 28 Feb 2024 14:21:33 GMT"
+      ],
+      "Connection": [
+        "keep-alive"
       ],
       "Access-Control-Allow-Origin": [
         "*"
       ],
       "Vary": [
-        "Accept",
-        "IS_SUBREQ",
-        "User-Agent"
+        "Accept"
       ],
       "X-Auth-Status": [
         "true"
       ],
       "X-RateLimit-Limit": [
-        "5 per hour"
+        "10 per hour"
       ],
       "X-RateLimit-Remaining": [
-        "5"
+        "8"
       ],
       "Cache-Control": [
         "max-age={expires}, pre-check=86400, post-check=43200"
@@ -67,14 +69,17 @@
       "X-Powered-By": [
         "Luracast Restler v3.0.0rc3"
       ],
-      "Upgrade": [
-        "h2"
+      "Content-Type": [
+        "application/json; charset=utf-8"
       ],
-      "Connection": [
-        "Upgrade"
+      "Content-Length": [
+        "212"
       ],
-      "Transfer-Encoding": [
-        "chunked"
+      "Expires": [
+        "0"
+      ],
+      "Content-Language": [
+        "en"
       ]
     }
   }

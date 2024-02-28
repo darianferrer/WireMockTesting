@@ -1,6 +1,6 @@
 ﻿{
   "Request": {
-    "Path": "/translate/yoda",
+    "Path": "/translate/shakespeare",
     "Methods": [
       "POST"
     ],
@@ -10,7 +10,7 @@
         "Matchers": [
           {
             "Name": "WildcardMatcher",
-            "Pattern": "GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated",
+            "Pattern": "GivenUpstreamError_WhenTextIsSubmitted_ThenErrorIsReturned",
             "IgnoreCase": true
           }
         ]
@@ -25,41 +25,32 @@
     }
   },
   "Response": {
-    "StatusCode": 200,
-    "BodyAsJson": {
-      "success": {
-        "total": 1
-      },
-      "contents": {
-        "translated": "Lost a planet,  master obiwan has.",
-        "text": "Master Obiwan has lost a planet.",
-        "translation": "yoda"
-      }
-    },
-    "BodyAsJsonIndented": true,
+    "StatusCode": 500,
     "Headers": {
-      "Date": [
-        "Thu, 12 Jan 2023 13:41:06 GMT"
-      ],
       "Server": [
-        "Apache"
+        "nginx/1.14.0",
+        "(Ubuntu)"
+      ],
+      "Date": [
+        "Wed, 28 Feb 2024 14:22:19 GMT"
+      ],
+      "Connection": [
+        "keep-alive"
       ],
       "Access-Control-Allow-Origin": [
         "*"
       ],
       "Vary": [
-        "Accept",
-        "IS_SUBREQ",
-        "User-Agent"
+        "Accept"
       ],
       "X-Auth-Status": [
         "true"
       ],
       "X-RateLimit-Limit": [
-        "5 per hour"
+        "10 per hour"
       ],
       "X-RateLimit-Remaining": [
-        "3"
+        "7"
       ],
       "Cache-Control": [
         "max-age={expires}, pre-check=86400, post-check=43200"
@@ -67,8 +58,17 @@
       "X-Powered-By": [
         "Luracast Restler v3.0.0rc3"
       ],
-      "Transfer-Encoding": [
-        "chunked"
+      "Content-Type": [
+        "application/json; charset=utf-8"
+      ],
+      "Content-Length": [
+        "222"
+      ],
+      "Expires": [
+        "0"
+      ],
+      "Content-Language": [
+        "en"
       ]
     }
   }
