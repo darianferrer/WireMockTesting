@@ -23,7 +23,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
     public CustomTestApplicationFactory()
     {
         FunTranslationsServer = WireMockServer.Start();
-        LoadConfiguration(FunTranslationsServer.Url!);
+        LoadConfiguration(FunTranslationsServer.Url);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -36,7 +36,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
             {
                 services.Replace(ServiceDescriptor.Scoped<IValidator<TranslationRequest>, TranslationRequestValidator>());
                 services.AddOptions<WireMockServers>()
-                    .Configure(opt => opt.MockedUrls = new() { FunTranslationsServer.Url! });
+                    .Configure(opt => opt.MockedUrls = [FunTranslationsServer.Url!]);
 
                 services.AddTransient<NoExternalRequestsDelegatingHandler>();
 
@@ -59,13 +59,13 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
     }
 
     [MemberNotNull(nameof(_configuration))]
-    private void LoadConfiguration(string url)
+    private void LoadConfiguration(string? url)
     {
         _configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
             .AddJsonFile("appsettings.Development.json")
             .AddJsonFile("appsettings.test.json")
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "AppSettings:FunTranslations", url },
             })
@@ -75,7 +75,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
 
 internal record WireMockServers
 {
-    public HashSet<string> MockedUrls { get; set; }
+    public HashSet<string> MockedUrls { get; set; } = [];
 
     public bool IsUrlMocked(Uri url)
     {

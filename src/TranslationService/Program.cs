@@ -60,7 +60,7 @@ app.MapPost("/translate", async (
     {
         return Results.ValidationProblem(new Dictionary<string, string[]>
         {
-            {  nameof(TranslationRequest.Type), new[]{ "Unsuported translation type" } },
+            {  nameof(TranslationRequest.Type), ["Unsuported translation type"] },
         });
     }
 

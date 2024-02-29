@@ -141,7 +141,7 @@ public class NotificationApiTests
     [InlineData("Testing 1, 2, 3 probando", "WrongType")]
     [InlineData("Testing 1, 2, 3 probando", "Unknown")]
     public async Task GivenInvalidTranslationRequest_WhenItIsSubmitted_ThenBadRequestIsReturned(
-        string text,
+        string? text,
         string translationType)
     {
         // Arrange

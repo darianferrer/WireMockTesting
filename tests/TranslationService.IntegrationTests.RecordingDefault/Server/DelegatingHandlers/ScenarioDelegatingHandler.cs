@@ -38,7 +38,7 @@ internal class ScenarioAccessor
         return context != null
             && context.Request.Headers.TryGetValue(Constants.ScenarioHeader, out var scenario)
             && !string.IsNullOrWhiteSpace(scenario)
-            ? (string)scenario
+            ? (string?)scenario
             : null;
     }
 }

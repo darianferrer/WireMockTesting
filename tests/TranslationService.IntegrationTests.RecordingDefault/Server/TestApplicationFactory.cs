@@ -16,23 +16,23 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly IConfigurationRoot _configuration;
     private const string FunTranslationsPosition = "AppSettings:FunTranslations";
-    private readonly List<Action<HttpClient>> ClientCustomisation = new();
+    private readonly List<Action<HttpClient>> ClientCustomisation = [];
 
     public WireMockServer FunTranslationsServer { get; }
 
     public CustomTestApplicationFactory()
     {
         var originalConfig = LoadConfiguration();
-        
+
         var settings = new WireMockServerSettings
         {
             ReadStaticMappings = true,
             ProxyAndRecordSettings = new ProxyAndRecordSettings
             {
-                Url = originalConfig[FunTranslationsPosition],
+                Url = originalConfig.GetValue<string>(FunTranslationsPosition)!,
                 SaveMapping = true,
                 SaveMappingToFile = true,
-                ExcludedHeaders = new[] { "traceparent", "Host" },
+                ExcludedHeaders = ["traceparent", "Host"],
                 AppendGuidToSavedMappingFile = true,
             },
             FileSystemHandler = CreateFileHandler(originalConfig),
@@ -64,7 +64,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
             .ConfigureTestServices(services =>
             {
                 services.AddOptions<WireMockServers>()
-                    .Configure(opt => opt.MockedUrls = new() { FunTranslationsServer.Url! });
+                    .Configure(opt => opt.MockedUrls = [FunTranslationsServer.Url!]);
 
                 services.AddTransient<ScenarioAccessor>();
                 services.AddTransient<ScenarioDelegatingHandler>();
@@ -89,7 +89,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
         }
     }
 
-    private static IConfigurationRoot LoadConfiguration(params (string ServiceConfig, string MockedUrl)[] mockedServers)
+    private static IConfigurationRoot LoadConfiguration(params (string ServiceConfig, string? MockedUrl)[] mockedServers)
     {
         var builder = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json")
@@ -101,20 +101,20 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
             .Build();
     }
 
-    private static IFileSystemHandler CreateFileHandler(IConfigurationRoot originalConfig)
+    private static LocalFileSystemHandler CreateFileHandler(IConfigurationRoot originalConfig)
     {
         var mocksPath = Path.Combine(
             "..", // net6.0
             "..", // Debug
             "..", // bin
-            originalConfig["TestConfiguration:MocksPath"]);
-        return new LocalFileSystemHandler(mocksPath);
+            originalConfig["TestConfiguration:MocksPath"]!);
+        return new(mocksPath);
     }
 }
 
 internal record WireMockServers
 {
-    public HashSet<string> MockedUrls { get; set; }
+    public HashSet<string> MockedUrls { get; set; } = [];
 
     public bool IsUrlMocked(Uri url)
     {

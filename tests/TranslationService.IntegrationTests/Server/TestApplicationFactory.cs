@@ -42,7 +42,7 @@ public class CustomTestApplicationFactory : WebApplicationFactory<Program>
             .AddJsonFile("appsettings.json")
             .AddJsonFile("appsettings.Development.json")
             .AddJsonFile("appsettings.test.json")
-            .AddInMemoryCollection(new Dictionary<string, string>
+            .AddInMemoryCollection(new Dictionary<string, string?>
             {
                 { "AppSettings:FunTranslations", url },
             })

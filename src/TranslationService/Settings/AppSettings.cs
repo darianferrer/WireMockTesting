@@ -7,5 +7,5 @@ public class AppSettings
     public const string Position = nameof(AppSettings);
 
     [Required]
-    public Uri FunTranslations { get; set; }
+    public Uri FunTranslations { get; set; } = default!;
 }
