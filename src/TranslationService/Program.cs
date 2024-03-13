@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Http.Json;
 using TranslationService;
 using TranslationService.FunTranslations;
@@ -17,13 +16,8 @@ builder.Services
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => c.SchemaFilter<EnumSchemaFilter>());
 
-builder.Services.AddValidatorsFromAssemblyContaining<TranslationRequestValidator>();
-builder.Services.AddFluentValidationAutoValidation(fv =>
-{
-    fv.DisableDataAnnotationsValidation = true;
-});
-builder.Services.AddFluentValidationClientsideAdapters();
-
+builder.Services.AddTransient<IValidator<TranslationRequest>, TranslationRequestValidator>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddHttpClient<FunTranslationServiceClient>();
 
 builder.Services.Configure<JsonOptions>(options =>
