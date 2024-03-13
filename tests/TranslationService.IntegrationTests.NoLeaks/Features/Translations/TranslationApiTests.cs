@@ -5,30 +5,35 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using AutoFixture;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using TranslationService.IntegrationTests.RecordingManually.Server;
+using TranslationService.IntegrationTests.NoLeaks.Mocks;
+using TranslationService.IntegrationTests.NoLeaks.Server;
 using TranslationService.Translations;
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
 using Xunit;
 
-namespace TranslationService.IntegrationTests.RecordingManually.Features.Notifications;
+namespace TranslationService.IntegrationTests.NoLeaks.Features.Translations;
 
 [Collection(nameof(CustomTestApplicationFactory))]
-public class NotificationApiTests
+public class TranslationApiTests
 {
     private readonly CustomTestApplicationFactory _applicationFactory;
     private readonly Fixture _fixture = new();
+    private readonly string _scenarioState = "START";
 
     private static readonly JsonSerializerOptions _options = new()
     {
         PropertyNameCaseInsensitive = true,
     };
 
-    static NotificationApiTests()
+    static TranslationApiTests()
     {
         _options.Converters.Add(new JsonStringEnumConverter());
     }
 
-    public NotificationApiTests(CustomTestApplicationFactory applicationFactory)
+    public TranslationApiTests(CustomTestApplicationFactory applicationFactory)
     {
         _applicationFactory = applicationFactory;
     }
@@ -37,7 +42,6 @@ public class NotificationApiTests
     public async Task GivenNoTranslationType_WhenTextIsSubmitted_ThenItIsReturnedWithoutChange()
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenNoTranslationType_WhenTextIsSubmitted_ThenItIsReturnedWithoutChange));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -67,7 +71,6 @@ public class NotificationApiTests
     public async Task GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated()
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -75,6 +78,11 @@ public class NotificationApiTests
             Type = "Yoda",
         };
         var content = GetContent(contract);
+
+        await SetFunTranslationsAsync(
+            nameof(GivenYodaTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated),
+            "yoda",
+            MockDataPaths.FunTranslations.MasterObiwanYoda);
 
         // Act
         var result = await client.PostAsync("/translate", content);
@@ -87,7 +95,7 @@ public class NotificationApiTests
             _options);
         response.Should().BeEquivalentTo(new
         {
-            Text = "Lost a planet,  master obiwan has.",
+            Text = "Lost a planet, master obiwan has.",
             OriginalText = contract.Text,
             Type = TranslationType.Yoda,
         });
@@ -97,7 +105,6 @@ public class NotificationApiTests
     public async Task GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated()
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -105,6 +112,11 @@ public class NotificationApiTests
             Type = "Shakespeare",
         };
         var content = GetContent(contract);
+
+        await SetFunTranslationsAsync(
+            nameof(GivenShakespeareTranslationType_WhenTextIsSubmitted_ThenItIsReturnedTranslated),
+            "shakespeare",
+            MockDataPaths.FunTranslations.MasterObiwanShakespeare);
 
         // Act
         var result = await client.PostAsync("/translate", content);
@@ -133,7 +145,6 @@ public class NotificationApiTests
         string translationType)
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenInvalidTranslationRequest_WhenItIsSubmitted_ThenBadRequestIsReturned));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -150,11 +161,9 @@ public class NotificationApiTests
     }
 
     [Fact]
-    // INFO: the mock associated with this test has been manually updated to simulate an upstream error
     public async Task GivenUpstreamError_WhenTextIsSubmitted_ThenErrorIsReturned()
     {
         // Arrange
-        AddScenarioHeader(nameof(GivenUpstreamError_WhenTextIsSubmitted_ThenErrorIsReturned));
         var client = _applicationFactory.CreateClient();
         var contract = new
         {
@@ -162,6 +171,17 @@ public class NotificationApiTests
             Type = "Shakespeare",
         };
         var content = GetContent(contract);
+
+        _applicationFactory.FunTranslationsServer
+            .Given(
+                Request.Create()
+                    .UsingPost()
+                    .WithPath("/translate/shakespeare"))
+            .InScenario(nameof(GivenUpstreamError_WhenTextIsSubmitted_ThenErrorIsReturned))
+            .WillSetStateTo(_scenarioState)
+            .RespondWith(
+                Response.Create()
+                    .WithStatusCode(StatusCodes.Status500InternalServerError));
 
         // Act
         var result = await client.PostAsync("/translate", content);
@@ -183,13 +203,20 @@ public class NotificationApiTests
     private static StringContent GetContent<T>(T contract) =>
         new(JsonSerializer.Serialize(contract, _options), Encoding.UTF8, MediaTypeNames.Application.Json);
 
-    private void AddScenarioHeader(string scenario, bool setRecordingMode = false)
+    private async Task SetFunTranslationsAsync(string scenario, string translationType, string jsonResponsePath)
     {
-        _applicationFactory.SetScenarioRecordingMode(scenario, setRecordingMode);
-        _applicationFactory.AddClientCustomisation(client =>
-        {
-            client.DefaultRequestHeaders.Remove(Constants.ScenarioHeader);
-            client.DefaultRequestHeaders.Add(Constants.ScenarioHeader, scenario);
-        });
+        var funTranslationContent = await File
+            .ReadAllTextAsync(jsonResponsePath);
+        _applicationFactory.FunTranslationsServer
+            .Given(
+                Request.Create()
+                    .UsingPost()
+                    .WithPath($"/translate/{translationType}"))
+            .InScenario(scenario)
+            .WillSetStateTo(_scenarioState)
+            .RespondWith(
+                Response.Create()
+                    .WithStatusCode(StatusCodes.Status200OK)
+                    .WithBody(funTranslationContent, "json"));
     }
 }
